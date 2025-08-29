@@ -8,9 +8,10 @@ import { authenticateRequest } from '@/lib/auth';
 import { validateItemData } from '@/lib/validation';
 import { CreateItemRequest } from '@/types/item';
 import { ApiResponse } from '@/types/api';
+import { NextRequest } from 'next/server';
 
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Authenticate request
     const user = await authenticateRequest(request);
@@ -37,7 +38,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Authenticate request
     const user = await authenticateRequest(request);
