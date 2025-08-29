@@ -1,3 +1,55 @@
+Forde Inventory – CRUD Barang
+================================
+
+Fitur
+- Login Admin (token JWT sederhana via API)
+- CRUD Barang: tambah, lihat, edit inline, hapus (terkunci jika stok > 0)
+- Validasi: nama ≥ 3, kode alfanumerik unik, kategori terdaftar, stok ≥ 0, harga > 0
+- Penyimpanan data: file JSON di `data/items.json`
+
+Stack
+- Next.js App Router (Route Handler untuk API)
+- TypeScript
+
+Menjalankan Lokal
+1. Masuk folder `cd client`
+2. Install deps: `npm install`
+3. Buat file `.env.local` (opsional, untuk override default):
+```
+JWT_SECRET=replace-with-strong-secret
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+```
+4. Jalan: `npm run dev`
+5. Buka `http://localhost:3000`
+
+API
+- POST `/api/auth` → login, body: `{ username, password }`
+- GET `/api/items` → list barang (butuh Authorization: Bearer <token>)
+- POST `/api/items` → tambah barang
+- GET `/api/items/:id` → detail barang
+- PUT `/api/items/:id` → update barang
+- DELETE `/api/items/:id` → hapus barang (hanya stok = 0)
+
+Deploy ke Vercel
+1. Push repository ke GitHub
+2. Import ke Vercel
+3. Set Environment Variables (Project → Settings → Environment Variables):
+   - `JWT_SECRET`
+   - `ADMIN_USERNAME`
+   - `ADMIN_PASSWORD`
+4. Deploy
+
+Catatan Persistensi di Vercel
+- Vercel serverless tidak persisten menulis ke filesystem. Untuk demo penuh persisten,
+  gunakan layanan DB (mis. Neon, Supabase) ATAU platform yang mengizinkan write (Railway/Render).
+- Aplikasi ini menggunakan file JSON untuk lokal. Untuk produksi, ganti implementasi `lib/db.ts`
+  ke database pilihan Anda.
+
+Demo Credentials
+- username: `admin`
+- password: `admin123`
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
