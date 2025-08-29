@@ -19,8 +19,8 @@ export function getAllItems(): Item[] {
       return [];
     }
     const data = fs.readFileSync(DB_PATH, 'utf8');
-    const items = JSON.parse(data);
-    return items.map((item: any) => ({
+    const items: Array<Omit<Item, 'createdAt' | 'updatedAt'> & { createdAt: string; updatedAt: string } > = JSON.parse(data);
+    return items.map((item) => ({
       ...item,
       createdAt: new Date(item.createdAt),
       updatedAt: new Date(item.updatedAt)
