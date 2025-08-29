@@ -7,14 +7,9 @@ import {
 import { authenticateRequest } from '@/lib/auth';
 import { validateItemData } from '@/lib/validation';
 import { ApiResponse } from '@/types/api';
+import { NextRequest } from 'next/server';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-}
-
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Authenticate request
     const user = await authenticateRequest(request);
@@ -25,7 +20,8 @@ export async function GET(request: Request, { params }: RouteParams) {
       } as ApiResponse, { status: 401 });
     }
 
-    const item = findItemById(params.id);
+    const { id } = await params;
+    const item = findItemById(id);
     
     if (!item) {
       return Response.json({
@@ -48,7 +44,7 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function PUT(request: Request, { params }: RouteParams) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Authenticate request
     const user = await authenticateRequest(request);
@@ -66,7 +62,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
         updates.stock !== undefined || updates.price !== undefined) {
       
       // Get current item to merge with updates for validation
-      const currentItem = findItemById(params.id);
+      const { id } = await params;
+      const currentItem = findItemById(id);
       if (!currentItem) {
         return Response.json({
           success: false,
@@ -93,7 +90,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
     }
 
     // Update item
-    const updatedItem = updateItem(params.id, updates);
+    const { id } = await params;
+    const updatedItem = updateItem(id, updates);
 
     return Response.json({
       success: true,
@@ -110,7 +108,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE(request: Request, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Authenticate request
     const user = await authenticateRequest(request);
@@ -122,7 +120,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
     }
 
     // Delete item (will check stock > 0 constraint)
-    deleteItem(params.id);
+    const { id } = await params;
+    deleteItem(id);
 
     return Response.json({
       success: true,

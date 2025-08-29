@@ -2,8 +2,9 @@
 import { validateCredentials, signToken } from '@/lib/auth';
 import { validateLoginData } from '@/lib/validation';
 import { AuthResponse } from '@/types/api';
+import { NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
 
