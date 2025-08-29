@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useItems } from '@/hooks/useItems';
-import { CATEGORIES, CreateItemRequest, Item } from '@/types/item';
+import { CATEGORIES, CreateItemRequest, Item, UpdateItemRequest } from '@/types/item';
 
 export default function Home() {
   const { isAuthenticated, login, logout, loginState, authHeader } = useAuth();
@@ -28,7 +28,7 @@ export default function Home() {
     const payload: CreateItemRequest = {
       name: String(formData.get('name') || ''),
       code: String(formData.get('code') || ''),
-      category: String(formData.get('category') || 'Elektronik') as any,
+      category: String(formData.get('category') || 'Elektronik') as CreateItemRequest['category'],
       stock: Number(formData.get('stock') || 0),
       price: Number(formData.get('price') || 0),
     };
@@ -36,18 +36,23 @@ export default function Home() {
       await createItem(payload);
       setNotif('Barang berhasil ditambahkan');
       form.reset();
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      const err = e as { message?: string } | Error;
+      const msg = err instanceof Error ? err.message : err?.message || 'Gagal menambah barang';
+      alert(msg);
     }
   };
 
-  const handleUpdate = async (item: Item, field: keyof Item, value: any) => {
-    const updates: any = { [field]: value };
+  type UpdatableField = keyof Omit<UpdateItemRequest, 'id'>;
+  const handleUpdate = async (item: Item, field: UpdatableField, value: string | number) => {
+    const updates: Partial<UpdateItemRequest> = { [field]: value } as Partial<UpdateItemRequest>;
     try {
       await updateItem(item.id, updates);
       setNotif('Barang berhasil diupdate');
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      const err = e as { message?: string } | Error;
+      const msg = err instanceof Error ? err.message : err?.message || 'Gagal mengupdate barang';
+      alert(msg);
     }
   };
 
@@ -56,8 +61,10 @@ export default function Home() {
     try {
       await deleteItem(id);
       setNotif('Barang berhasil dihapus');
-    } catch (e: any) {
-      alert(e.message);
+    } catch (e: unknown) {
+      const err = e as { message?: string } | Error;
+      const msg = err instanceof Error ? err.message : err?.message || 'Gagal menghapus barang';
+      alert(msg);
     }
   };
 

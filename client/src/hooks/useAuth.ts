@@ -31,8 +31,9 @@ export function useAuth() {
       setToken(data.token);
       setLoginState({ loading: false, error: null });
       return true;
-    } catch (e: any) {
-      setLoginState({ loading: false, error: e.message || 'Login gagal' });
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Login gagal';
+      setLoginState({ loading: false, error: message });
       return false;
     }
   }, []);
@@ -42,7 +43,11 @@ export function useAuth() {
     setToken(null);
   }, []);
 
-  const authHeader = useMemo(() => (token ? { Authorization: `Bearer ${token}` } : {}), [token]);
+  const authHeader = useMemo<Record<string, string>>(() => {
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  }, [token]);
 
   return { token, isAuthenticated: !!token, login, logout, loginState, authHeader };
 }

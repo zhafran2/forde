@@ -20,8 +20,9 @@ export function useItems(authHeader: Record<string, string>) {
         throw new Error(data.message || 'Gagal memuat data');
       }
       setState({ loading: false, error: null, items: data.data });
-    } catch (e: any) {
-      setState(s => ({ ...s, loading: false, error: e.message || 'Gagal memuat data' }));
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Gagal memuat data';
+      setState(s => ({ ...s, loading: false, error: message }));
     }
   }, [authHeader]);
 
@@ -39,7 +40,8 @@ export function useItems(authHeader: Record<string, string>) {
     });
     const data: ApiResponse<Item> = await res.json();
     if (!res.ok || !data.success || !data.data) {
-      throw new Error(data.errors?.[0] || data.message || 'Gagal menambah barang');
+      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : undefined;
+      throw new Error(firstError || data.message || 'Gagal menambah barang');
     }
     await fetchItems();
     return data.data;
@@ -53,7 +55,8 @@ export function useItems(authHeader: Record<string, string>) {
     });
     const data: ApiResponse<Item> = await res.json();
     if (!res.ok || !data.success || !data.data) {
-      throw new Error(data.errors?.[0] || data.message || 'Gagal mengupdate barang');
+      const firstError = Array.isArray(data.errors) && data.errors.length > 0 ? data.errors[0] : undefined;
+      throw new Error(firstError || data.message || 'Gagal mengupdate barang');
     }
     await fetchItems();
     return data.data;
